@@ -48,7 +48,6 @@ class system {
             {value:'AbilityMod', name:'Ability Score Modifier'},
             {value:'Save', name:'Saving Throw Modifier'},
             {value:'Skill', name:'Skill Modifier'},
-            {value:'Prof', name:'Proficiency'},
             {value:'Condition', name: 'Condition'},
             {value:'Perception', name: 'Perception'}
         ]
@@ -109,9 +108,9 @@ class system {
             let initiative = token.actor.attributes?.stealth?.value;
             return `Init: Stealth (${initiative})`; 
         }
-        let initiative = token.actor.attributes.initiative;
-        let initiativeModifier = initiative?.totalModifier;
-        let initiativeLabel = initiative?.label.replace('iative',''); //Initiative is too long for the button
+        let initiative = token.actor.initiative;
+        let initiativeModifier = initiative?.mod;
+        let initiativeLabel = initiative?.statistic.label; //Initiative is too long for the button
         if (initiativeModifier > 0) {
             initiativeModifier = `+${initiativeModifier}`;
         } else {
@@ -134,14 +133,14 @@ class system {
 
     getPerception(token) {
         if (this.isLimitedSheet(token.actor) || token.actor.type == 'hazard') return '';
-        let perception = token.actor.attributes.perception?.totalModifier;
+        let perception = token.actor.perception.mod;
         return (perception >= 0) ? `+${perception}` : perception;
     }
 
     getAbility(token, ability) {
         if (this.isLimitedSheet(token.actor) || token.actor.type == 'familiar') return '';
         if (ability == undefined) ability = 'str';
-        return token.actor.abilities?.[ability]?.value;
+        return token.actor.abilities?.[ability]?.mod*2 + 10;
     } 
 
     getAbilityModifier(token, ability) {
@@ -189,9 +188,9 @@ class system {
     }
 
     getSkill(token, skill) {
+        if (skill == undefined) skill = 'acr';
         const tokenSkill = this.findSkill(token, skill);
         if (tokenSkill == undefined) return '';
-        
         if (skill.startsWith('lor')) {
             return `${tokenSkill.name}: +${tokenSkill.totalModifier}`;
         }
@@ -250,6 +249,7 @@ class system {
     }
 
     getConditionActive(token,condition) {
+        if (condition == 'dead') return token.actor.isDead;
         return this.getCondition(token,condition) != undefined;
     }
 
@@ -292,6 +292,10 @@ class system {
         if (condition == 'removeAll'){
             for( let effect of token.actor.items.filter(i => i.type == 'condition'))
                 await effect.delete();
+        }
+        else if (condition == 'dead') {
+            const icon = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED).icon;
+            await token.toggleEffect(icon, {overlay:true})
         }
         else {
             const effect = this.getCondition(token,condition);
@@ -351,6 +355,7 @@ class system {
                 }
             }
             let skillName = this.getActorData(token).skills?.[skill].name;
+            console.log('skillName',skillName)
             skillName = skillName.charAt(0).toUpperCase() + skillName.slice(1);
             this.checkRoll(`Skill Check: ${skillName}`, token.actor.skills?.[skill], 'skill-check', token.actor);
         }
@@ -470,37 +475,43 @@ class system {
     buildSpellData(token) {
         let spellData = [[],[],[],[],[],[],[],[],[],[],[],[]];
         let spellcastingEntries = token.actor.spellcasting.contents; /////
-        console.log('sp',token.actor.spellcasting,spellcastingEntries)
+        console.log('spEntries',spellcastingEntries)
         const actorLevel = this.getActorData(token).details.level.value;
         spellcastingEntries.forEach(spellCastingEntry => {
-            let highestSpellSlot = Math.ceil(actorLevel/2);
-            while (spellCastingEntry.data.data.slots?.[`slot${highestSpellSlot}`]?.max <= 0) highestSpellSlot--;
-            //Prepared (not flexible)
-            console.log(spellCastingEntry)
-            if (spellCastingEntry.data.data.prepared?.value == 'prepared' && !spellCastingEntry?.data.data?.prepared?.flexible == true) {
-                for (let slotLevel = 0; slotLevel < 11; slotLevel++) {
-                    for (let slot = 0; slot < spellCastingEntry.data.data.slots?.[`slot${slotLevel}`].max; slot++) {
-                        let spellId = spellCastingEntry.data.data.slots?.[`slot${slotLevel}`].prepared?.[slot].id;
-                        let spell = spellCastingEntry.spells.get(spellId);
-                        if (spellId != null) {
-                            spellData[slotLevel].push(spell);
+            if (spellCastingEntry.category != 'ritual') {
+                console.log('entry',spellCastingEntry)
+                let highestSpellSlot = Math.ceil(actorLevel/2);
+                while (spellCastingEntry.system.slots?.[`slot${highestSpellSlot}`]?.max <= 0) highestSpellSlot--;
+                //Prepared (not flexible)
+                
+                if (spellCastingEntry.system.prepared?.value == 'prepared' && !spellCastingEntry?.system?.prepared?.flexible == true) {
+                    for (let slotLevel = 0; slotLevel < 11; slotLevel++) {
+                        for (let slot = 0; slot < spellCastingEntry.system.slots?.[`slot${slotLevel}`].max; slot++) {
+                            let spellId = spellCastingEntry.system.slots?.[`slot${slotLevel}`].prepared?.[slot].id;
+                            let spell = spellCastingEntry.spells.get(spellId);
+                            if (spellId != null) {
+                                spellData[slotLevel].push(spell);
+                            }
                         }
                     }
+                } else {
+                    spellCastingEntry.spells.forEach( ses => {
+                        if ((spellCastingEntry.system.prepared.value == 'spontaneous' || spellCastingEntry.system.prepared?.flexible == true) && ses.data.data.location.signature == true) {
+                            let baseLevel = this.getSpellLevel(ses);
+                            for (let level = baseLevel; level <= highestSpellSlot; level++) {
+                                spellData[level].push(ses);
+                            }
+                        } else {
+                            spellData[this.getSpellLevel(ses)].push(ses);
+                        }
+                    });
                 }
-            } else {
-                spellCastingEntry.spells.forEach( ses => {
-                    if ((spellCastingEntry.data.data.prepared.value == 'spontaneous' || spellCastingEntry.data.data.prepared?.flexible == true) && ses.data.data.location.signature == true) {
-                        let baseLevel = this.getSpellLevel(ses);
-                        for (let level = baseLevel; level <= highestSpellSlot; level++) {
-                            spellData[level].push(ses);
-                        }
-                    } else {
-                        spellData[this.getSpellLevel(ses)].push(ses);
-                    }
-                });
             }
+            
+            
         });
         this.tokenSpellData.set(token.id,  {spellData: spellData, timeStamp: Date.now()});
+        console.log('spellData',spellData)
         return spellData;
     }
 
@@ -588,12 +599,22 @@ class system {
     }
 
     getSpellLevels() {
-        const keys = Object.keys(this.conf.spellLevels);
+        //const keys = Object.keys(this.conf.spellLevels);
         let levels = [
-            {value:'f', name: game.i18n.localize("PF2E.SpellCategoryFocus")},
-            {value:'0', name: game.i18n.localize("PF2E.SpellCantripLabel")}
+            {value:'f', name: game.i18n.localize("PF2E.TraitFocus")},
+            {value:'0', name: game.i18n.localize("PF2E.TraitCantrip")},
+            {value:'1', name: '1'},
+            {value:'2', name: '2'},
+            {value:'3', name: '3'},
+            {value:'4', name: '4'},
+            {value:'5', name: '5'},
+            {value:'6', name: '6'},
+            {value:'7', name: '7'},
+            {value:'8', name: '8'},
+            {value:'9', name: '9'},
+            {value:'10', name: '10'}
         ];
-        for (let l of keys) levels.push({value:l, name:game.i18n.localize(this.conf.spellLevels?.[l])});
+        //for (let l of keys) levels.push({value:l, name:game.i18n.localize(this.conf.spellLevels?.[l])});
         return levels;
     }
 

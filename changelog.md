@@ -1,4 +1,15 @@
 # Changelog Material Deck - Pathfinder 2e
-### v1.0.0 - 25-04-2024
+### v1.0.0 - 09-05-2024
 
 Initial release
+
+Changes compared to Material Deck v1.6.2:
+
+<ul>
+<li>Fixed 'dead' condition</li>
+<li>Fixed ability score display</li>
+<li>Got rid of initiative deprication warning</li>
+<li>Got rid of perception deprication warning</li>
+<li>Updated fortitude.png and reflex.png names so they are displayed again</li>
+<li>Fixed spellbook mode</li>
+</ul>
