@@ -1,5 +1,3 @@
-import { materialDeck } from "../MaterialDeck/MaterialDeck.js";
-
 const data = {
     moduleId: 'materialdeck-pf2e',
     systemId: 'pf2e',
@@ -625,8 +623,8 @@ class system {
 
     rollItem(item, settings) {
         let variant = 0;
-        if (materialDeck.otherControls.rollOption == 'map1') variant = 1;
-        if (materialDeck.otherControls.rollOption == 'map2') variant = 2;
+        if (game.materialDeck.otherControls.rollOption == 'map1') variant = 1;
+        if (game.materialDeck.otherControls.rollOption == 'map2') variant = 2;
         if (item?.parent?.type == 'hazard' && item.type==='melee') return item.rollNPCAttack({}, variant+1);
         if (item.type==='strike') return item.variants[variant].roll({event});
         if (item?.parent?.type !== 'hazard' && (item.type==='weapon' || item.type==='melee')) return item.parent.data.data.actions.find(a=>a.name===item.name).variants[variant].roll({event});
@@ -687,7 +685,7 @@ class system {
 Hooks.once('MaterialDeck_Ready', () => {
     const moduleData = game.modules.get(data.moduleId);
 
-    materialDeck.registerSystem({
+    game.materialDeck.registerSystem({
         systemId: data.systemId,
         moduleId: data.moduleId,
         systemName: data.systemName,
