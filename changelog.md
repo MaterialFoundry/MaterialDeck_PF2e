@@ -1,8 +1,10 @@
 # Changelog Material Deck - Pathfinder 2e
 
 ### v1.0.2 - 07-06-2024
--Fixed 'strikes' not properly displaying image and label. Thanks to @lazybobcat for the fix
--Made compatible with pf2e v6
+<ul>
+<li>Fixed 'strikes' not properly displaying image and label. Thanks to @lazybobcat for the fix</li>
+<li>Made compatible with pf2e v6</li>
+</ul>
 
 ### v1.0.1 - 11-05-2024
 Fixed issue with the system not properly regestering on the Forge
