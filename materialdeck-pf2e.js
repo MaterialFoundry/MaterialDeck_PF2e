@@ -428,7 +428,8 @@ class system {
             }
             let actions = this.getActorData(token).actions?.filter(a=>a.type == 'strike');
             for (let a of actions) {
-                a.img = a.imageUrl;
+                a.img = a.imageUrl || a.item?.img;
+                a.name = a.label || a.item?.name;
                 a.data = {
                     sort: 1
                 };
