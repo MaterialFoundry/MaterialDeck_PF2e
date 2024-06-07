@@ -213,10 +213,11 @@ class system {
     }
 
     getSkillList() {
-        const keys = Object.keys(this.conf.skills);
+        const keys = game.materialDeck.compatibleSystem('6') ? Object.keys(this.conf.skillList) : Object.keys(this.conf.skills);
         let skills = [];
         for (let s of keys) {
-            skills.push({value:s, name:game.i18n.localize(this.conf.skills?.[s])})
+            const name = game.materialDeck.compatibleSystem('6') ? this.conf.skillList?.[s] : this.conf.skills?.[s];
+            skills.push({value:s, name:game.i18n.localize(name)})
         }
         for (let i=1; i<4; i++) skills.push({value:`lor_${i}`, name: `${game.i18n.localize(this.conf.skillList.lore)} #${i}`})
         return skills;
@@ -242,7 +243,7 @@ class system {
     getConditionIcon(condition) {
         if (condition == undefined) condition = 'removeAll';
         if (condition == 'removeAll') return window.CONFIG.controlIcons.effects;
-        //else return `${CONFIG.PF2E.statusEffects.iconDir}${condition}.webp`;
+        else if (game.materialDeck.compatibleSystem('6')) return CONFIG.statusEffects.find(e => e.id === condition).img;
         else return CONFIG.statusEffects.find(e => e.id === condition).icon;
     }
 
@@ -310,7 +311,10 @@ class system {
 
     getConditionList() {
         let conditions = [];
-        for (let c of CONFIG.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.label)});
+        if (game.materialDeck.compatibleSystem('6'))
+            for (let c of CONFIG.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.name)});
+        else 
+            for (let c of this.conf.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.label)});
         return conditions;
     }
 
