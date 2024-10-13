@@ -4,7 +4,7 @@ const data = {
     systemName: 'Pathfinder 2e'
 }
 
-const limitedSheets = ['loot', 'vehicle'];
+const limitedSheets = ['loot', 'vehicle', 'party'];
 
 const proficiencyColors = {
     untrained: "#424242",
@@ -94,7 +94,7 @@ class system {
         }
         let speed = `${token.actor.attributes.speed?.total}'`;
         const otherSpeeds = token.actor.attributes.speed?.otherSpeeds;
-        if (otherSpeeds.length > 0)
+        if (otherSpeeds?.length > 0)
             for (let os of otherSpeeds) 
                  speed += `\n${os.type} ${os.total}'`;    
         return speed;
@@ -131,7 +131,7 @@ class system {
 
     getPerception(token) {
         if (this.isLimitedSheet(token.actor) || token.actor.type == 'hazard') return '';
-        let perception = token.actor.perception.mod;
+        let perception = token.actor.perception?.mod ?? 0;
         return (perception >= 0) ? `+${perception}` : perception;
     }
 
@@ -190,7 +190,7 @@ class system {
         const tokenSkill = this.findSkill(token, skill);
         if (tokenSkill == undefined) return '';
         if (skill.startsWith('lor')) {
-            return `${tokenSkill.name}: +${tokenSkill.totalModifier}`;
+            return `${tokenSkill.label}: +${tokenSkill.totalModifier}`;
         }
 
         const val = tokenSkill.totalModifier;
@@ -213,13 +213,12 @@ class system {
     }
 
     getSkillList() {
-        const keys = game.materialDeck.compatibleSystem('6') ? Object.keys(this.conf.skillList) : Object.keys(this.conf.skills);
+        const keys = Object.keys(this.conf.skills);
         let skills = [];
         for (let s of keys) {
-            const name = game.materialDeck.compatibleSystem('6') ? this.conf.skillList?.[s] : this.conf.skills?.[s];
-            skills.push({value:s, name:game.i18n.localize(name)})
+            skills.push({value:s, name:game.i18n.localize(this.conf.skills?.[s].label)})
         }
-        for (let i=1; i<4; i++) skills.push({value:`lor_${i}`, name: `${game.i18n.localize(this.conf.skillList.lore)} #${i}`})
+        //for (let i=1; i<4; i++) skills.push({value:`lor_${i}`, name: `${game.i18n.localize(this.conf.skillList.lore)} #${i}`})
         return skills;
     }
 
@@ -243,8 +242,8 @@ class system {
     getConditionIcon(condition) {
         if (condition == undefined) condition = 'removeAll';
         if (condition == 'removeAll') return window.CONFIG.controlIcons.effects;
-        else if (game.materialDeck.compatibleSystem('6')) return CONFIG.statusEffects.find(e => e.id === condition).img;
-        else return CONFIG.statusEffects.find(e => e.id === condition).icon;
+        //else return `${CONFIG.PF2E.statusEffects.iconDir}${condition}.webp`;
+        else return CONFIG.statusEffects.find(e => e.id === condition).img;
     }
 
     getConditionActive(token,condition) {
@@ -281,8 +280,8 @@ class system {
     }
 
     getConditionName(condition) {
-        if ("flatFooted" == condition) {
-            return 'Flat-Footed'; //An inconsistency has been introduced on the PF2E system. The icon is still using 'flatFooted' as the name, but the condition in the manager has been renamed to 'Flat-Footed'
+        if ("off-guard" == condition) {
+            return 'Off-Guard'; //An inconsistency has been introduced on the PF2E system. The icon is still using 'flatFooted' as the name, but the condition in the manager has been renamed to 'Flat-Footed'
         } else return condition.charAt(0).toUpperCase() + condition.slice(1);
     }
 
@@ -293,7 +292,7 @@ class system {
                 await effect.delete();
         }
         else if (condition == 'dead') {
-            const icon = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED).icon;
+            const icon = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED).img;
             await token.toggleEffect(icon, {overlay:true})
         }
         else {
@@ -311,10 +310,7 @@ class system {
 
     getConditionList() {
         let conditions = [];
-        if (game.materialDeck.compatibleSystem('6'))
-            for (let c of CONFIG.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.name)});
-        else 
-            for (let c of this.conf.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.label)});
+        for (let c of CONFIG.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.name)});
         return conditions;
     }
 
@@ -414,14 +410,14 @@ class system {
         const allItems = token.actor.items;
         if (featureType == 'any') return allItems.filter(i => i.type == 'ancestry' || i.type == 'background' || i.type == 'class' || i.type == 'feat' || i.type == 'action' || i.type == 'heritage' || i.type == 'deity' || i.type == '');
         if (featureType == 'feat-any') return allItems.filter(i => i.type == 'feat');
-        if (featureType == 'ancestryfeature') return allItems.filter(i => i.type == 'feat' && i.featType == 'ancestryfeature');
-        if (featureType == 'classfeature') return allItems.filter(i => i.type == 'feat' && i.featType == 'classfeature');
-        if (featureType == 'feat-anc') return allItems.filter(i => i.type == 'feat' && i.featType == 'ancestry');
-        if (featureType == 'feat-arc') return allItems.filter(i => i.type == 'feat' && i.featType == 'archetype' && i.name.indexOf('Dedication') < 0);
-        if (featureType == 'feat-ded') return allItems.filter(i => i.type == 'feat' && i.featType == 'archetype' && i.name.indexOf('Dedication') > 0);
-        if (featureType == 'feat-cla') return allItems.filter(i => i.type == 'feat' && i.featType == 'class');
-        if (featureType == 'feat-gen') return allItems.filter(i => i.type == 'feat' && i.featType == 'general');
-        if (featureType == 'feat-ski') return allItems.filter(i => i.type == 'feat' && i.featType == 'skill');
+        if (featureType == 'ancestryfeature') return allItems.filter(i => i.type == 'feat' && i.system.category == 'ancestryfeature');
+        if (featureType == 'classfeature') return allItems.filter(i => i.type == 'feat' && i.system.category == 'classfeature');
+        if (featureType == 'feat-anc') return allItems.filter(i => i.type == 'feat' && i.system.category == 'ancestry');
+        if (featureType == 'feat-arc') return allItems.filter(i => i.type == 'feat' && i.system.category == 'archetype' && i.name.indexOf('Dedication') < 0);
+        if (featureType == 'feat-ded') return allItems.filter(i => i.type == 'feat' && i.system.category == 'archetype' && i.name.indexOf('Dedication') > 0);
+        if (featureType == 'feat-cla') return allItems.filter(i => i.type == 'feat' && i.system.category == 'class');
+        if (featureType == 'feat-gen') return allItems.filter(i => i.type == 'feat' && i.system.category == 'general');
+        if (featureType == 'feat-ski') return allItems.filter(i => i.type == 'feat' && i.system.category == 'skill');
         if (featureType == 'action-any') return allItems.filter(i => i.type == 'action');
         if (featureType == 'action-def') return allItems.filter(i => i.type == 'action' && this.getItemData(i).actionCategory?.value == 'defensive');
         if (featureType == 'action-int') return allItems.filter(i => i.type == 'action' && this.getItemData(i).actionCategory?.value == 'interaction');
@@ -430,7 +426,7 @@ class system {
             if (token.actor.type == 'hazard' || token.actor.type == 'familiar') {
                 return allItems.filter(i => i.type == 'melee' || i.type == 'ranged');
             }
-            let actions = this.getActorData(token).actions?.filter(a=>a.type == 'strike');
+            let actions = this.getActorData(token).actions?.filter(a=>a.type == 'strike') ?? [];
             for (let a of actions) {
                 a.img = a.imageUrl || a.item?.img;
                 a.name = a.label || a.item?.name;
@@ -444,7 +440,7 @@ class system {
     }
 
     getFeatureUses(item) {
-        if (item.data.type == 'class') return {available: item.parent.data.data.details.level.value};
+        if (item.type == 'class') return {available: item.parent.system.details.level.value};
         else return;
     }
 
@@ -477,11 +473,11 @@ class system {
      */
     buildSpellData(token) {
         let spellData = [[],[],[],[],[],[],[],[],[],[],[],[]];
-        let spellcastingEntries = token.actor.spellcasting.contents; /////
+        let spellcastingEntries = token.actor.spellcasting?.contents; /////
         console.log('spEntries',spellcastingEntries)
         const actorLevel = this.getActorData(token).details.level.value;
-        spellcastingEntries.forEach(spellCastingEntry => {
-            if (spellCastingEntry.category != 'ritual') {
+        spellcastingEntries?.forEach(spellCastingEntry => {
+            if (spellCastingEntry.category != 'ritual' && spellCastingEntry.system) {
                 console.log('entry',spellCastingEntry)
                 let highestSpellSlot = Math.ceil(actorLevel/2);
                 while (spellCastingEntry.system.slots?.[`slot${highestSpellSlot}`]?.max <= 0) highestSpellSlot--;
@@ -499,7 +495,7 @@ class system {
                     }
                 } else {
                     spellCastingEntry.spells.forEach( ses => {
-                        if ((spellCastingEntry.system.prepared.value == 'spontaneous' || spellCastingEntry.system.prepared?.flexible == true) && ses.data.data.location.signature == true) {
+                        if ((spellCastingEntry.system.prepared.value == 'spontaneous' || spellCastingEntry.system.prepared?.flexible == true) && ses.system.location.signature == true) {
                             let baseLevel = this.getSpellLevel(ses);
                             for (let level = baseLevel; level <= highestSpellSlot; level++) {
                                 spellData[level].push(ses);
@@ -559,18 +555,18 @@ class system {
         }
         const spellbook = this.findSpellcastingEntry(token.actor, item);
         if (spellbook == undefined) return;
-        if (spellbook.data.data.prepared.value == 'innate') {
+        if (spellbook.system.prepared.value == 'innate') {
             return {
                 available: this.getItemData(item).location.uses.value,
                 maximum: this.getItemData(item).location.uses.max
             }
         }
-        if (spellbook.data.data.prepared.value == 'prepared') {
-            if (!spellbook.data.data.prepared?.flexible == true) {
+        if (spellbook.system.prepared.value == 'prepared') {
+            if (!spellbook.system.prepared?.flexible == true) {
                 let slotsExpended = 0;
                 let slotsPrepared = 0;
-                for (let slot = 0; slot < spellbook.data.data.slots?.[`slot${level}`].max; slot++) {
-                    let slotEntry = spellbook.data.data.slots?.[`slot${level}`].prepared?.[slot];
+                for (let slot = 0; slot < spellbook.system.slots?.[`slot${level}`].max; slot++) {
+                    let slotEntry = spellbook.system.slots?.[`slot${level}`].prepared?.[slot];
                     if (slotEntry.id == item.id) {
                         slotsPrepared++;
                         if (slotEntry?.expended == true) {
@@ -585,19 +581,19 @@ class system {
             }
         }
         return {
-            available: spellbook.data.data.slots?.[`slot${level}`].value,
-            maximum: spellbook.data.data.slots?.[`slot${level}`].max
+            available: spellbook.system.slots?.[`slot${level}`].value,
+            maximum: spellbook.system.slots?.[`slot${level}`].max
         }
     }
 
     findSpellcastingEntry(actor, spell) {
         let spellcastingEntries = actor.spellcasting;
         let result;
-        spellcastingEntries.forEach(spellCastingEntry => {
-            if (spellCastingEntry.spells.get(spell.id) != undefined) {
+        for (const spellCastingEntry of spellcastingEntries) {
+            if (spellCastingEntry.spells?.get(spell.id) != undefined) {
                 result = spellCastingEntry;
             }
-        });
+        };
         return result;
     }
 
@@ -632,20 +628,20 @@ class system {
         if (game.materialDeck.otherControls.rollOption == 'map2') variant = 2;
         if (item?.parent?.type == 'hazard' && item.type==='melee') return item.rollNPCAttack({}, variant+1);
         if (item.type==='strike') return item.variants[variant].roll({event});
-        if (item?.parent?.type !== 'hazard' && (item.type==='weapon' || item.type==='melee')) return item.parent.data.data.actions.find(a=>a.name===item.name).variants[variant].roll({event});
+        if (item?.parent?.type !== 'hazard' && (item.type==='weapon' || item.type==='melee')) return item.parent.system.actions.find(a=>a.name===item.name).variants[variant].roll({event});
         if (item.type === 'spell') {
             const spellbook = this.findSpellcastingEntry(item.parent, item);
             if (spellbook != undefined) {
                 let spellLvl = item.level;
                 if (settings.spellType == 'f' || settings.spellType == '0') {
-                    const actorLevel = item.parent.data.data.details.level.value;
+                    const actorLevel = item.parent.system.details.level.value;
                     spellLvl =  Math.ceil(actorLevel/2);
                 } else if (settings.spellType != 'any') {
                     spellLvl = settings.spellType;
                 }
-                if (spellbook.data.data.prepared.value == 'prepared' && !spellbook.data.data.prepared?.flexible == true) {
-                    for (let slotId = 0; slotId < spellbook.data.data.slots?.[`slot${spellLvl}`].max; slotId++) {
-                        let slotEntry = spellbook.data.data.slots?.[`slot${spellLvl}`].prepared?.[slotId];
+                if (spellbook.system.prepared.value == 'prepared' && !spellbook.system.prepared?.flexible == true) {
+                    for (let slotId = 0; slotId < spellbook.system.slots?.[`slot${spellLvl}`].max; slotId++) {
+                        let slotEntry = spellbook.system.slots?.[`slot${spellLvl}`].prepared?.[slotId];
                         if (slotEntry.id == item.id) {
                             if (!slotEntry?.expended == true) {
                                 return spellbook.cast(item, {slot: slotId, level: spellLvl});
