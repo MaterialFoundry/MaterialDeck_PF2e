@@ -106,6 +106,7 @@ If you then set the offset to 9, it will display items 10 - 19.
 | Colors            | <b>-On Color</b>: (`Set to Value` only) A border is drawn on the Stream Deck of this color if the current offset is equal to the offset configured in `Offset`.<br><b>-Off Color</b>: (`Set to Value` only) A border is drawn on the Stream Deck of this color if the current offset is not equal to the offset configured in `Offset`.<br><b>-Background</b>: Background color of the button. |
 
 ## Wound Overlay
+<div class="imgContainer"><img src="../../img/wound-overlays.jpg"></div>
 Wound overlays can give the approximate health state of a token. For example, based on how much relative HP a token has it can overlay one or more blood drops over the token icon:
 
 | HP Percentage | Overlay       |
