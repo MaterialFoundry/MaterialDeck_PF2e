@@ -9,10 +9,10 @@ let spellbookOffset = 0;
 export const spellbookMode = {
 
     updateAll: function() {
-        for (let device of game.materialDeck.streamDeck.deviceManager.devices) {
+        for (let device of materialDeck.streamDeck.deviceManager.devices) {
             for (let button of device.buttons.buttons) {
-                if (game.materialDeck.Helpers.getButtonAction(button) !== 'token') continue;
-                if (game.materialDeck.Helpers.getButtonSettings(button).mode !== 'spellbook') continue;
+                if (materialDeck.Helpers.getButtonAction(button) !== 'token') continue;
+                if (materialDeck.Helpers.getButtonSettings(button).mode !== 'spellbook') continue;
                 button.update('md-pf2e.updateAllTokenSpellbook')
             }
         }
@@ -20,7 +20,7 @@ export const spellbookMode = {
 
     getActions: function(settings) {
         let actions = { update: [], keyDown: [], keyUp: [], hold: [] };
-        const holdTime = game.materialDeck.holdTime;
+        const holdTime = materialDeck.holdTime;
 
         const spellbookSettings = settings.spellbookMode;
 
@@ -87,7 +87,7 @@ export const spellbookMode = {
         const displaySettings = data.settings.display.spellbookMode.setSync;
 
         let text = displaySettings.name ? getSpellTypes(true).find(t => t.value == mode)?.label : '';
-        const thisSelected = game.materialDeck.Helpers.isSynced(data.settings.spellbookMode.setSync, 'spellbookMode.syncFilter', 'spellbookMode.',  'token');
+        const thisSelected = materialDeck.Helpers.isSynced(data.settings.spellbookMode.setSync, 'spellbookMode.syncFilter', 'spellbookMode.',  'token');
 
         return {
             text,
@@ -382,6 +382,7 @@ function getSpellTypes(includeCantrips=false) {
 }
 
 function getSpell(actor, settings) {
+    if (!actor) return;
     let spells = actor.itemTypes['spell']
 
     const mode = settings.mode;
@@ -397,15 +398,15 @@ function getSpell(actor, settings) {
     else if (settings.selection.mode === 'nameId') {
         spell = spells.find(i => i.id === settings.selection.nameId.split('.').pop());
         if (!spell) spell = spells.find(i => i.name === settings.selection.nameId);
-        if (!spell) spell = spells.find(i => game.materialDeck.Helpers.stringIncludes(i.name,settings.selection.nameId));
+        if (!spell) spell = spells.find(i => materialDeck.Helpers.stringIncludes(i.name,settings.selection.nameId));
     }
 
     return spell;
 }
 
 function castSpell(spell, settings) {
-    const rollModifier = settings.rollModifier === 'default' ? Helpers.getRollModifier(true) : settings.rollModifier;
-    const rollType = settings.rollType === 'default' ? Helpers.getRollType(true) : settings.rollType;
+    const rollModifier = settings.rollModifier === 'default' ? Helpers.rollModifier.get(true) : settings.rollModifier;
+    const rollType = settings.rollType === 'default' ? Helpers.rollType.get(true) : settings.rollType;
 
     return;
 

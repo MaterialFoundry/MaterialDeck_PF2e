@@ -1,8 +1,8 @@
 {
     "id": "materialdeck-pf2e",
-    "title": "Material Deck - Pathfinder 2e",
-    "description": "This module adds support for 'Pathfinder 2e' to Material Deck.",
-    "version": "2.0.0",
+    "title": "Material Deck - Pathfinder 2e/Starfinder 2e",
+    "description": "This module adds support for 'Pathfinder 2e' and 'Starfinder 2e' to Material Deck.",
+    "version": "2.1.0",
     "authors": [
         {
             "name": "Material Foundry",
@@ -27,15 +27,15 @@
                 "id": "materialdeck-premium",
                 "type": "module",
                 "compatibility": {
-                    "minimum": "2.0.0",
-                    "verified": "2.0.0"
+                    "minimum": "2.2.0",
+                    "verified": "2.2.0"
                 }
             }
         ]
     },
     "compatibility": {
-        "minimum": "12",
-        "verified": "13"
+        "minimum": "13",
+        "verified": "14"
     },
     "url": "https://github.com/MaterialFoundry/MaterialDeck_PF2e",
     "manifest": "https://github.com/MaterialFoundry/MaterialDeck_PF2e/releases/latest/download/module.json",

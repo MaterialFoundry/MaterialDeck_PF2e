@@ -42,14 +42,14 @@ export const otherAction = {
             icon: data.settings.display.icon ? Helpers.getImage('d20.png') : "",
             options: {
                 border: true,
-                borderColor: Helpers.getRollModifier() === mode ? data.settings.colors.rollModeOn : data.settings.colors.rollModeOff,
+                borderColor: Helpers.rollModifier.get() === mode ? data.settings.colors.rollModeOn : data.settings.colors.rollModeOff,
                 dim: true
             }
         };
     },
 
     onKeypressRollModifier: function(data) {
-        Helpers.setRollModifier(data.settings.rollModifier.mode, data.settings.rollModifier.reset);
+        Helpers.rollModifier.set(data.settings.rollModifier.mode, data.settings.rollModifier.reset);
     },
 
     onUpdateRollType: function(data) {
@@ -71,7 +71,7 @@ export const otherAction = {
             icon,
             options: {
                 border: true,
-                borderColor: Helpers.getRollType() === mode ? data.settings.colors.rollModeOn : data.settings.colors.rollModeOff,
+                borderColor: Helpers.rollType.get() === mode ? data.settings.colors.rollModeOn : data.settings.colors.rollModeOff,
                 iconSize,
                 iconSpacing
             }
@@ -79,7 +79,7 @@ export const otherAction = {
     },
 
     onKeypressRollType: function(data) {
-        Helpers.setRollType(data.settings.rollType.mode, data.settings.rollType.reset);
+        Helpers.rollType.set(data.settings.rollType.mode, data.settings.rollType.reset);
     },
 
     settingsConfig: function() {

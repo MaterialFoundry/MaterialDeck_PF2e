@@ -1,4 +1,4 @@
-site_name: Material Deck PF2E Documentation
+site_name: Material Deck PF2E/SF2E Documentation
 site_url: https://materialfoundry.github.io/MaterialDeck_PF2E/
 nav:
   - Home: index.md

@@ -53,18 +53,6 @@ export class Helpers {
         ]
     }
 
-    static getRollModifier(reset=false) {
-        const type = rollModifier;
-        if (reset && rollModifierDefault !== 'none') Helpers.setRollModifier(rollModifierDefault, rollModifierDefault);
-        return type;
-    }
-    
-    static setRollModifier(mode, resetTo) {
-        rollModifier = mode;
-        rollModifierDefault = resetTo;
-        Hooks.call('mdUpdateRollModifier');
-    }
-
     /**
      * Roll Types
      */
@@ -72,8 +60,8 @@ export class Helpers {
         return [
             { value: 'description', label: Helpers.localize('Description', 'ALL')},
             { value: 'strike', label: Helpers.localize('WeaponStrikeLabel', 'PF2E')},
-            { value: 'map1', label: Helpers.localize('WeaponMAPLabel', 'PF2E') + '#1'},
-            { value: 'map2', label: Helpers.localize('WeaponMAPLabel', 'PF2E') + '#2'},
+            { value: 'map1', label: 'MAP #1'},
+            { value: 'map2', label: 'MAP #2'},
             { value: 'damage', label: Helpers.localize('DamageLabel', 'PF2E')},
             { value: 'critical', label: Helpers.localize('CriticalDamageLabel', 'PF2E')},
             { value: 'use', label: Helpers.localize('Item.Consumable.Uses.Use', 'PF2E')}
@@ -92,18 +80,6 @@ export class Helpers {
         ]
     }
 
-    static getRollType(reset=false) {
-        const type = rollType;
-        if (reset && rollTypeDefault !== 'none') Helpers.setRollType(rollTypeDefault, rollTypeDefault);
-        return type;
-    }
-    
-    static setRollType(mode, resetTo) {
-        rollType = mode;
-        rollTypeDefault = resetTo;
-        Hooks.call('mdUpdateRollType');
-    }
-
     static async getItemDisplay(item, actor, displaySettings) {
         let text = "";
         let toHit = "";
@@ -120,8 +96,8 @@ export class Helpers {
 
             //Get damage
             damage = `${item.system.damage.dice}${item.system.damage.die}`;
-            if (item.system.bonusDamage.value > 0) damage += `+${item.system.bonusDamage.value}`
-            else if (item.system.bonusDamage.value < 0) damage += `${item.system.bonusDamage.value}`
+            if (item.system.bonusDamage?.value > 0) damage += `+${item.system.bonusDamage.value}`
+            else if (item.system.bonusDamage?.value < 0) damage += `${item.system.bonusDamage.value}`
 
             //Get range
             if (item.system.range)
@@ -132,7 +108,7 @@ export class Helpers {
 
             //Get toHit
             if (isSave) {
-                let label = `Saves${game.materialDeck.Helpers.capitalizeFirstLetter(item.system.defense.save.statistic)}Short`
+                let label = `Saves${materialDeck.Helpers.capitalizeFirstLetter(item.system.defense.save.statistic)}Short`
                 toHit = `${actor.system.attributes.spellDC.value}DC ${Helpers.localize(label, 'PF2E')}`
             }
             else if (item.system.defense) {
@@ -195,8 +171,8 @@ export class Helpers {
     }
 
     static async useItem(item, actor, settings) {
-        const rollModifier = settings.rollModifier === 'default' ? Helpers.getRollModifier(true) : settings.rollModifier;
-        const rollType = settings.rollType === 'default' ? Helpers.getRollType(true) : settings.rollType;
+        const rollModifier = settings.rollModifier === 'default' ? Helpers.rollModifier.get(true) : settings.rollModifier;
+        const rollType = settings.rollType === 'default' ? Helpers.rollType.get(true) : settings.rollType;
 
         if (rollType === 'description' && item.id !== "xxPF2ExUNARMEDxx") return game.pf2e.rollItemMacro(`Actor.${actor.id}.Item.${item.id}`);
         if (rollType === 'use') {
@@ -224,7 +200,7 @@ export class Helpers {
             oldShowCheckDialogsChanged = game.user.settings.showCheckDialogs;
             game.user.settings.showCheckDialogs = true;
         }
-    
+
         //Strike, MAP1 or MAP2
         if (strikeVariant >= 0) 
             await action.variants[strikeVariant]?.roll({ rollTwice });

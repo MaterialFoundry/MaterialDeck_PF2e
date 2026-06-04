@@ -84,7 +84,7 @@ export const tokenMode = {
 
         const onPress = settings.tokenMode.keyUp?.mode;
         const onHold = settings.tokenMode.hold?.mode;
-        const holdTime = game.materialDeck.holdTime;
+        const holdTime = materialDeck.holdTime;
 
         if (onPress === 'condition') {
             actions.update.push({
@@ -373,7 +373,7 @@ export const tokenMode = {
     onKeydownRoll: function(data) {
         if (!data.actor) return;
         const settings = data.settings.tokenMode[data.actionType]?.roll;
-        const rollModifier = settings.modifier === 'default' ? Helpers.getRollModifier(true) : settings.modifier;
+        const rollModifier = settings.modifier === 'default' ? Helpers.rollModifier.get(true) : settings.modifier;
 
         const skipDialog = rollModifier !== 'dialog';
         const rollTwice = rollModifier === 'advantage' ? 'keep-higher' : rollModifier === 'disadvantage' ? 'keep-lower' : false;
@@ -551,7 +551,7 @@ function getTokenOnPress(mode='keyUp') {
                             id: `tokenMode.${mode}.roll.mode`,
                             type: "select",
                             options: [
-                                {value: 'initiative', label: localize('InitiativeLabel', 'PF2E')},
+                                {value:'initiative', label: localize('InitiativeLabel', 'PF2E')},
                                 {value:'save', label: localize('Save')},
                                 {value:'skill', label: localize('SkillLabel', 'PF2E')}
                             ]

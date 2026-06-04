@@ -9,10 +9,10 @@ let actionsOffset = 0;
 export const actionsMode = {
 
     updateAll: function() {
-        for (let device of game.materialDeck.streamDeck.deviceManager.devices) {
+        for (let device of materialDeck.streamDeck.deviceManager.devices) {
             for (let button of device.buttons.buttons) {
-                if (game.materialDeck.Helpers.getButtonAction(button) !== 'token') continue;
-                if (game.materialDeck.Helpers.getButtonSettings(button).mode !== 'actions') continue;
+                if (materialDeck.Helpers.getButtonAction(button) !== 'token') continue;
+                if (materialDeck.Helpers.getButtonSettings(button).mode !== 'actions') continue;
                 button.update('md-pf2e.updateAllTokenActions')
             }
         }
@@ -331,7 +331,7 @@ function getAction(actor, settings) {
     else if (settings.selection.mode === 'nameId') {
         item = items.find(i => i.id === settings.selection.nameId.split('.').pop());
         if (!item) item = items.find(i => i.name === settings.selection.nameId);
-        if (!item) item = items.find(i => game.materialDeck.Helpers.stringIncludes(i.name, settings.selection.nameId));
+        if (!item) item = items.find(i => materialDeck.Helpers.stringIncludes(i.name, settings.selection.nameId));
         return item;
     }
 

@@ -1,10 +1,10 @@
-# Material Deck PF2E Documentation
+# Material Deck PF2E/SF2E Documentation
 
-!!! Info "Material Deck PF2E Documentation"
-    This documentation is for the Pathfinder 2e system module for [Material Deck](https://foundryvtt.com/packages/materialdeck-premium).<br>
+!!! Info "Material Deck PF2E/SF2E Documentation"
+    This documentation is for the Pathfinder 2e and Starfinder 2e system modules for [Material Deck](https://foundryvtt.com/packages/materialdeck-premium).<br>
     Please refer to the [Material Deck documentation](https://materialfoundry.github.io/MaterialDeck/) for more info on Material Deck.
 
-The Material Deck PF2E system module adds PF2E-dependent features to Material Deck to the following actions:
+The Material Deck PF2E/SF2E system module adds PF2E/SF2E-dependent features to Material Deck to the following actions:
 
 * [Combat Tracker](./actions/combatTracker.md)
 * [Other Actions](./actions/otherActions.md)
@@ -12,9 +12,12 @@ The Material Deck PF2E system module adds PF2E-dependent features to Material De
 
 
 ## Combatibility
+Tested on:<br>
+<b>Foundry VTT</b>: v13-v14<br>
+<b>Pathfinder 2e</b>: v7<br>
+<b>Starfinder 2e</b>: v0.0.11
 
-<b>Foundry VTT</b>: v12-v13<br>
-<b>Pathfinder 2e</b>: v6
+Requires Material Deck v2.2.0+.
 
 ## Feedback & Issues
 If you have any suggestions or bugs to report, feel free to:
