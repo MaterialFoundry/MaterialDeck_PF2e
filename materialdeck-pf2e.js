@@ -3,7 +3,7 @@ import { otherAction } from "./actions/other.js";
 import { tokenAction } from "./actions/token.js";
 import { Helpers } from "./helpers.js";
 
-export const documentation = "https://materialfoundry.github.io/MaterialDeck_PF2E/";
+export const documentation = "https://materialfoundry.github.io/MaterialDeck_PF2e/";
 
 Hooks.once('MaterialDeck_Ready', () => {
     Helpers.rollModifier = new materialDeck.Helpers.ModeSwitcher('normal', 'mdUpdateRollModifier');
