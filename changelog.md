@@ -1,7 +1,12 @@
 # Changelog Material Deck - Pathfinder 2/Starfinder 2
 
+## v2.1.1 - 18-06-2026
+
+### Fixes:
+* Status effects are now correctly parsed in PF2e v8 and SF2e v1.
+
 ## v2.1.0 - 04-06-2026
-This update requires Material Deck v2.2.0 or newer.
+This version requires Material Deck v2.2.0 or newer.
 
 ### Fixes:
 * Fixed MAP localization

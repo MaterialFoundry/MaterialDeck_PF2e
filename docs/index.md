@@ -14,8 +14,8 @@ The Material Deck PF2E/SF2E system module adds PF2E/SF2E-dependent features to M
 ## Combatibility
 Tested on:<br>
 <b>Foundry VTT</b>: v13-v14<br>
-<b>Pathfinder 2e</b>: v7<br>
-<b>Starfinder 2e</b>: v0.0.11
+<b>Pathfinder 2e</b>: v7-v8<br>
+<b>Starfinder 2e</b>: v0.0.11-v1
 
 Requires Material Deck v2.2.0+.
 

@@ -596,7 +596,7 @@ function getTokenOnPress(mode='keyUp') {
 function getConditionIcon(condition) {
     if (condition == 'removeAll') 
         return window.CONFIG.controlIcons.effects;
-    return CONFIG.statusEffects.find(e => e.id === condition).img;
+    return Helpers.getStatusEffects().find(e => e.id === condition).img;
 }
 
 function getConditionActive(actor, condition) {
@@ -640,7 +640,7 @@ function getSkillList() {
 
 function getConditionList() {
     let conditions = [];
-    for (let c of CONFIG.statusEffects) 
+    for (let c of Helpers.getStatusEffects()) 
         conditions.push({
             value: c.id, 
             label: localize(c.name, 'ALL')

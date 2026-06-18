@@ -231,4 +231,12 @@ export class Helpers {
 
         return arr;
     }
+
+    static getStatusEffects() {
+        const type = foundry.utils.getType(CONFIG.statusEffects);
+
+        if (type === "Array") return CONFIG.statusEffects;
+        else if (type === "Object") return Object.values(CONFIG.statusEffects);
+        return [];
+    }
 }
